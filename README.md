@@ -1,4 +1,4 @@
-# MindSync — Mental Health AI Companion
+# MindAI — Mental Health AI Companion
 ## Production-Ready Setup Guide
 
 ---
