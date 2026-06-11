@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="icon" type="image/png" href="logo.png">
+  <title>Mind AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Mind<span>AI</span></div>
+    <div class="login-tagline">Your AI-powered emotional wellness companion</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <div id="loginForm">
+      <div class="field"><label>Username</label>
+        <input type="text" id="li_user" placeholder="username" autocomplete="off">
+      </div>
+      <div class="field"><label>Password</label>
+        <input type="password" id="li_pass" placeholder="*******">
+      </div>
+      <div class="err-msg" id="li_err"></div>
+      <button class="btn-primary" id="li_btn" onclick="doLogin()">Sign In →</button>
+    </div>
+
+    <div id="signupForm" style="display:none">
+      <div class="field"><label>Full Name</label>
+        <input type="text" id="su_name" placeholder="Your full name">
+      </div>
+      <div class="field"><label>Email</label>
+        <input type="email" id="su_email" placeholder="you@email.com">
+      </div>
+      <div class="field"><label>Username</label>
+        <input type="text" id="su_user" placeholder="Pick a username">
+      </div>
+      <div class="field"><label>Password</label>
+        <input type="password" id="su_pass" placeholder="Min. 6 characters">
+      </div>
+      <div class="err-msg" id="su_err"></div>
+      <button class="btn-primary" id="su_btn" onclick="doSignup()">Create Account →</button>
+    </div>
+
+    <div class="login-note">JWT authenticated · Your data is private</div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN APP ══════════════ -->
+<div id="app">
+  <header>
+    <div class="logo">Mind<span>AI</span></div>
+    <div class="nav-row">
+      <button class="nav-btn active" id="navChat"    onclick="gotoView('chat')">💬 Chat</button>
+      <button class="nav-btn"        id="navReport"  onclick="gotoView('report')">📊 Report</button>
+      <button class="nav-btn"        id="navHistory" onclick="gotoView('history')">🕒 History</button>
+      <button class="nav-btn"                        onclick="gotoView('doctors')">🏥 Doctors</button>
+    </div>
+    <div class="hdr-right">
+      <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <div class="user-chip">
+        <div class="avatar" id="hdrAvatar">?</div>
+        <span class="uname" id="hdrName">User</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <!-- LEFT PANEL -->
+    <div class="panel-left">
+      <div class="sec-title">Live Camera</div>
+      <div class="cam-wrap" id="camWrap">
+        <video id="video" autoplay muted playsinline></video>
+        <div class="cam-overlay">📷 Camera Off</div>
+        <div class="cam-border"><div class="cam-dot" id="camDot"></div></div>
+      </div>
+
+      <div class="toggle-row">
+        <button class="tog-btn" id="camTogBtn" onclick="toggleCamera()">📷 Cam</button>
+        <button class="tog-btn" id="micTogBtn" onclick="toggleMic()">🎤 Mic</button>
+      </div>
+
+      <div class="sec-title">Emotion Signals</div>
+      <div class="e-grid">
+        <div class="e-card">
+          <div class="e-ico">🎥</div>
+          <div class="e-info"><div class="e-lbl">Face</div><div class="e-val" id="elFace">Detecting…</div></div>
+        </div>
+        <div class="e-card">
+          <div class="e-ico">💬</div>
+          <div class="e-info"><div class="e-lbl">Sentiment</div><div class="e-val" id="elSent">Neutral</div></div>
+          <div class="badge b-neu" id="sentBadge">—</div>
+        </div>
+        <div class="e-card">
+          <div class="e-ico">🎤</div>
+          <div class="e-info"><div class="e-lbl">Voice</div><div class="e-val" id="elVoice">Idle</div></div>
+        </div>
+      </div>
+
+      <div class="sev-wrap">
+        <div class="sev-top">
+          <span class="sev-lbl">Session Severity</span>
+          <span class="sev-num" id="sevNum">—</span>
+        </div>
+        <div class="sev-track"><div class="sev-fill" id="sevFill"></div></div>
+        <div style="margin-top:5px"><span class="badge b-neu" id="sevBadge">Not assessed</span></div>
+      </div>
+
+      <div class="action-pad">
+        <button class="act-btn" onclick="generateReport()"><span class="act-ico">📋</span> Generate Report</button>
+        <button class="act-btn" onclick="gotoView('doctors')"><span class="act-ico">🏥</span> Find Doctors</button>
+        <button class="act-btn" onclick="newSession()"><span class="act-ico">🔄</span> New Session</button>
+      </div>
+    </div>
+
+    <!-- CHAT VIEW -->
+    <div class="panel-center" id="viewChat">
+      <div class="chat-box" id="chatBox">
+        <div class="sys-msg">Session started · Emotions are being monitored</div>
+      </div>
+      <div class="typing" id="typingDots">
+        <div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>
+      </div>
+      <div class="input-row">
+        <input id="userInput" type="text" placeholder="How are you feeling today…">
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <!-- REPORT VIEW -->
+    <div class="page-view" id="viewReport">
+      <div class="max-w">
+        <div class="page-head">Session Report</div>
+        <div class="page-sub" id="rptMeta">Generate a report to see your analysis</div>
+        <div class="spinner" id="rptSpinner"></div>
+        <div id="rptContent">
+          <div class="empty"><div class="empty-ico">📊</div>Have a conversation, then click <strong>Generate Report</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div class="page-view" id="viewHistory">
+      <div class="max-w">
+        <div class="page-head">Session History</div>
+        <div class="page-sub">Your past conversations and reports</div>
+        <div class="spinner" id="histSpinner"></div>
+        <div id="histContent"></div>
+      </div>
+    </div>
+
+    <!-- DOCTORS VIEW -->
+    <div class="page-view" id="viewDoctors">
+      <div class="max-w">
+        <div class="page-head">Find Mental Health Support</div>
+        <div class="page-sub">Doctors and helplines matched to your situation</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <div><div class="sf-lbl">Your City</div><input class="sf-inp" id="docCity" placeholder="e.g. Pune, Mumbai, Delhi"></div>
+          <div><div class="sf-lbl">Language Preference</div><input class="sf-inp" id="docLang" value="Hindi" placeholder="Hindi, Marathi, English"></div>
+          <div><div class="sf-lbl">Main Concern (optional)</div><input class="sf-inp" id="docConcern" placeholder="e.g. anxiety, stress, depression"></div>
+          <button class="sf-btn" id="docBtn" onclick="findDoctors()">🔍 Search Doctors &amp; Helplines</button>
+        </div>
+        <div class="spinner" id="docSpinner"></div>
+        <div id="docContent"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel-right">
+      <div class="rtabs">
+        <button class="rtab active" onclick="switchRTab('rSug',this)">Suggestions</button>
+        <button class="rtab"        onclick="switchRTab('rHL',this)">Helplines</button>
+        <button class="rtab"        onclick="switchRTab('rStats',this)">Stats</button>
+      </div>
+      <div class="rpanel active" id="rSug">
+        <div class="empty"><div class="empty-ico">💡</div>Suggestions appear after<br>you generate a report.</div>
+      </div>
+      <div class="rpanel" id="rHL">
+        <div class="hl-card">
+          <div class="hl-name">iCall — TISS</div>
+          <div class="hl-num"><a href="tel:9152987821" style="color:inherit;text-decoration:none">9152987821</a></div>
+          <div class="hl-meta">Mon–Sat · 8am–10pm · Hindi &amp; English</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-name">Vandrevala Foundation</div>
+          <div class="hl-num"><a href="tel:18602662345" style="color:inherit;text-decoration:none">1860-2662-345</a></div>
+          <div class="hl-meta">24/7 · Hindi &amp; English</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-name">AASRA</div>
+          <div class="hl-num"><a href="tel:9820466627" style="color:inherit;text-decoration:none">9820466627</a></div>
+          <div class="hl-meta">24/7 · Any mental health crisis</div>
+        </div>
+        <div class="hl-card">
+          <div class="hl-name">Snehi</div>
+          <div class="hl-num"><a href="tel:04424640050" style="color:inherit;text-decoration:none">044-24640050</a></div>
+          <div class="hl-meta">24/7 · Emotional distress</div>
+        </div>
+      </div>
+      <div class="rpanel" id="rStats">
+        <div class="empty"><div class="empty-ico">📈</div>Live session stats appear as you chat.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
